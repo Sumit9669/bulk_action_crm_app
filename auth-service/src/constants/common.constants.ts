@@ -14,3 +14,10 @@ export const statusCodes = {
     INTERNAL_SERVER_ERROR: 500,
     SERVICE_UNAVAILABLE: 503,
 };
+
+export const errorMessages={
+    AUTH_ACCESS_ERROR:'Invalid Token or Unauthorized Access!',
+    AUTH_TOKEN_MISSING:'Authorization Token is missing!',
+    AUTH_TOKEN_EXPIRED:'Token Expired'
+
+}

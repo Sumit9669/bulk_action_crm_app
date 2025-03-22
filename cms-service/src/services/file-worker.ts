@@ -1,42 +1,61 @@
-import { parentPort, workerData } from 'worker_threads';
+import { Worker as WorkerThread, isMainThread, parentPort, workerData } from 'worker_threads';
 import fs from 'fs';
 import path from 'path';
-import { FileActions } from '../interfaces/enums/common.enum';
+import { BatchInsetionOperationService } from './batch-insertion-operation.service';
+import { BatchUpdateOperationService } from './batch-update-operations.service';
+import { CommonMethods } from '../utils/common-methods';
 
-// Define the interface for worker data to provide type safety
-interface WorkerData {
-  filePath: string;
-  fileId: string; // Assuming fileId is a string, adjust the type based on your data model
-  actionType:FileActions,
-  currenrProcessedIndex:number
-}
+const batchInsertSvc = new BatchInsetionOperationService();
+const batchUpdateOps = new BatchUpdateOperationService();
+const commonMethods = new CommonMethods()
 
-// This function simulates file processing (e.g., reading or writing files)
-async function processFile(workerData: WorkerData): Promise<string> {
+/**
+ * The function `processFile` reads a file, parses its content as JSON, and performs different actions
+ * based on the `actionType` provided in the input data.
+ * @param {any} workerData - workerData is an object containing information about the file to be
+ * processed. It includes the following properties:
+ * @returns The `processFile` function is returning a Promise.
+ */
+async function processFile(workerData: any) {
   return new Promise((resolve, reject) => {
-    // Using fs.promises.readFile instead of the callback-based fs.readFile
-    fs.readFile(workerData.filePath, 'utf8', (err, data) => {
+    fs.readFile(workerData.filePath, 'utf8', async (err, data) => {
       if (err) {
         return reject(`Error reading file at ${workerData.filePath}: ${err.message}`);
       }
       try {
-        // Parse the file content (assuming it's JSON)
         const jsonData = JSON.parse(data);
-      //  check actionType and based on that either start update request or insert request 
-
-        // Here, add the logic to process the JSON data (e.g., import contacts or other business logic)
+        if (workerData.actionType === 1) {
+          await batchUpdateOps.updateBulkData(jsonData, 0, workerData.fileId, workerData.actionType, workerData.accountId);
+        } else {
+          await batchInsertSvc.insertDataInDb(jsonData, 0, workerData.fileId, workerData.actionType, workerData.accountId);
+        }
+        fs.unlinkSync(workerData.filePath);
         resolve(`Successfully processed ${workerData.filePath}`);
       } catch (parseError) {
+        await commonMethods.errorLogger({
+          rawFileId: workerData.fileId,
+          actionType: workerData.actionType,
+          accountId:workerData.accountId,
+          status: 0 ,
+          errorDetail: `${parseError}`,
+     
+      });
         reject(`Error parsing JSON in file ${workerData.filePath}: ${parseError.message}`);
+        
       }
     });
   });
 }
 
-// Process the file
-async function process(): Promise<void> {
+
+/**
+ * The `initiateProcess` function asynchronously processes a file using worker data and sends the
+ * result or error message back to the parent thread.
+ */
+async function initiateProcess() {
+  const { filePath, fileId, actionType, currentProcessedIndex, accountId } = workerData;
   try {
-    const { filePath, fileId, actionType, currenrProcessedIndex }: WorkerData = workerData;
+     // Removed type annotations
 
     // Resolve the full path (this may be based on the system path or a specific directory)
     const fullPath = path.resolve(__dirname, filePath);
@@ -45,11 +64,18 @@ async function process(): Promise<void> {
 
     // Send the result back to the parent thread
     parentPort?.postMessage(result);
-  } catch (error: any) {
-    // Send error message back to the parent thread
+  } catch (error) {
+    await commonMethods.errorLogger({
+      rawFileId:fileId,
+      actionType,
+      accountId,
+      status: 0 ,
+      errorDetail: `${error}`,
+ 
+  });
     parentPort?.postMessage({ error: error.message });
   }
 }
 
 // Start the worker process
-process();
+initiateProcess();

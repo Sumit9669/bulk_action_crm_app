@@ -10,15 +10,17 @@ export interface IContactLogsError extends Document {
     rawFileId:Types.ObjectId | IRawFile;
     errorType: Number;
     actionType:Number;
+    accountId:string;
     createdAt: Date;
     updatedAt: Date;
+    errorMetaData:any;
 }
 
 // Define the schema for the Contact model
 const contactLogsErrorSchema: Schema<IContactLogsError> = new Schema(
     {
         name: { type: String, required: true },
-        email: { type: String, required: true, unique: true },
+        email: { type: String, required: true },
         phone: { type: String, required: false },
         address: { type: String, required: false },
         rawFileId:{
@@ -31,10 +33,15 @@ const contactLogsErrorSchema: Schema<IContactLogsError> = new Schema(
             type:Number,
             required:true
         },
+        errorMetaData:{
+            type: mongoose.Schema.Types.Mixed,
+            required: true
+        },
         actionType:{
             type:Number,
             required:true
         },
+        accountId:{ type: String, required: true },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now }
     },

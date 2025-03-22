@@ -2,7 +2,7 @@ import { createClient, RedisClientOptions } from "redis";
 require("dotenv").config();
 // import { createPool, Pool } from "generic-pool";
 
-const REDIS_URL = `rediss://default:AXCpAAIjcDFhZjk0NWRlY2U3Mjg0ZTMwOWM0NmY0NzhhNzZhN2RmOXAxMA@liberal-shark-28841.upstash.io:6379` // process.env.REDIS_URL || "redis://localhost:6379";
+const REDIS_URL =  process.env.REDIS_URL || "redis://localhost:6379";
 
 if (!REDIS_URL) {
   throw new Error("REDIS_URL environment variable is not defined");

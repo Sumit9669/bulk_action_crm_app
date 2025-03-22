@@ -19,3 +19,8 @@ export enum FileStatus{
     REJECTED,
     ERROR
 }
+
+export enum ValidationErrorType{
+    DUPLICATE_DATA=0,
+    VALDIATION_ERROR
+}

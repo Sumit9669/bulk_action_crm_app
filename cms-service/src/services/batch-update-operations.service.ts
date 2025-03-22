@@ -4,13 +4,17 @@ import ContactModel from '../models/contacts.model';
 import { RawFileRepository } from '../repositories/rawFile.repository';
 import { IRawFile } from '../models/raw-files.model';
 import { FileStatus } from '../interfaces/enums/common.enum';
+import { ContactLogsRepository } from '../repositories/contact-logs.repository';
+import { CommonMethods } from '../utils/common-methods';
 
 const contactsRepository = new ContactsRepository();
-
+const contactsErrorLogsRepository = new ContactLogsRepository();
+const commonMethods = new CommonMethods();
 export class BatchUpdateOperationService {
     private rawFileRepository = new RawFileRepository();
-  
-    async updateBulkData(jsonData: any, startIndex: number = 0, rawFileId:string) {
+    private skippedEntries: any[] = [];
+    private duplicateEnteries: any[]= [];
+    async updateBulkData(jsonData: any, startIndex: number = 0, rawFileId:string,actionType:number, accountId:string) {
         let batchIndex = startIndex;
         const totalContacts = jsonData.length;
         const batchSize = 20;
@@ -18,9 +22,28 @@ export class BatchUpdateOperationService {
             for (batchIndex; batchIndex < totalContacts; batchIndex += batchSize) {
                 // Slice the data into a batch of 'batchSize'
                 const batchData = jsonData.slice(batchIndex, batchIndex + batchSize);
-                for(let item of batchData){
+                for (let i = 0; i < batchData.length; i++) {
+                    const item = batchData[i];
                     item['rawFileId'] = rawFileId;
+                    
+                    // Validate email and phone before processing
+                    const validationResult = commonMethods.validateEmailAndPhone(item);
+                    if (!validationResult.isValid) {
+                        // If the entry is invalid, store it in skippedEntries
+                        this.skippedEntries.push({
+                            ...item,
+                            actionType,
+                            errorType: 1,
+                            errorMetaData: validationResult.message
+                        });
+                        // Remove invalid item from the batch
+                        batchData.splice(i, 1);
+                        i--; // Adjust index after removal
+                        continue; // Skip to the next item
+                    }
+
                 }
+
                 let currentSize = batchData.length;
                 // Process the batch (this is the actual insertion logic)
                 await contactsRepository.updateBulk(batchData);  // Replace with your bulk update method
@@ -30,20 +53,30 @@ export class BatchUpdateOperationService {
 
                 // Update the batch index in the database or file (e.g., mark status as processed)
                 await this.updateBatchStatus(batchIndex + currentSize, rawFileId);  // You can update the index after the batch is fully processed
-
+                
             }
-
+            await this.addSkippedData();
             console.log('All data processed successfully.');
             // Optionally update the final status of the file in the database (indicating processing completion)
             await this.updateFinalStatus(rawFileId,batchIndex); 
 
         } catch (err) {
+            await this.addSkippedData();
             // If an error occurs, log and update the last processed batch index
             console.error('Error during batch processing:', err);
-
+          
             // Update the batch index where the process failed
             await this.updateBatchStatus(batchIndex, rawFileId);  // Update last successful batch index to resume from there
             throw new Error(`Error occurred at batch index: ${batchIndex}`);
+        }
+    }
+    async addSkippedData() {
+        try {
+            console.log("++++++++++++++++skipped data++++++++++",this.skippedEntries[0]);
+            await contactsErrorLogsRepository.addBulk(this.skippedEntries);
+            console.log(`skiped enteries saved$`);
+        } catch (err) {
+            console.error('Error saving skipped batch:', err);
         }
     }
 
@@ -56,14 +89,13 @@ export class BatchUpdateOperationService {
             const rawFilePayload = {
                 currentDataIndex:lastProcessedIndex
             }
-             await this.rawFileRepository.update(id,rawFilePayload);
+             await this.rawFileRepository.findOneAndUpdate(id,rawFilePayload);
             console.log(`Batch status updated: Last processed index is ${lastProcessedIndex}`);
         } catch (err) {
             console.error('Error updating batch status:', err);
         }
     }
 
-    // Function to update final processing status in the database (e.g., marking the file as fully processed)
     private async updateFinalStatus(rawFileId:string, processedIndex:number ): Promise<void> {
         try {
             // Update final processing status (e.g., mark the file processing as completed)
@@ -71,12 +103,13 @@ export class BatchUpdateOperationService {
                 currentDataIndex:processedIndex,
                 status: FileStatus.COMPELTED
             }
-             await this.rawFileRepository.update(rawFileId,rawFilePayload);
+             await this.rawFileRepository.findOneAndUpdate(rawFileId,rawFilePayload);
             console.log('File processing completed successfully.');
         } catch (err) {
             console.error('Error updating final status:', err);
         }
     }
+
 }
 
 

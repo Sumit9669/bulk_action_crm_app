@@ -16,8 +16,8 @@ export const statusCodes = {
 };
 
 export const errorMessages={
-    AUTH_ACCESS_ERROR:'',
-    AUTH_TOKEN_MISSING:'',
-    AUTH_TOKEN_EXPIRED:''
+    AUTH_ACCESS_ERROR:'Invalid Token or Unauthorized Access!',
+    AUTH_TOKEN_MISSING:'Authorization Token is missing!',
+    AUTH_TOKEN_EXPIRED:'Token Expired'
 
 }

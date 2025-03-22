@@ -1,13 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "skipLibCheck": true
+    "target": "ES2020",  // Target a modern version of JavaScript
+    "module": "CommonJS",  // Using CommonJS for Node.js compatibility
+    "moduleResolution": "node",  // Resolving modules in Node.js style
+    "esModuleInterop": true,  // Enable compatibility for importing CommonJS modules
+    "outDir": "./dist",  // Output directory for transpiled files
+    "rootDir": "./src",  // Root directory for TypeScript source files
+    "skipLibCheck": true,  // Skip checking of library files (e.g., conflicting types)
+    "resolveJsonModule": true,  // Allows importing JSON files as modules
+    "typeRoots": ["node_modules/@types", "src/types"],  // Custom types directory
+    "types": ["node", "express"],  // Include node and express types
+    "allowJs": true,  // Allow JavaScript files (if you use them)
+    // "strict": true  // Enable strict type-checking options
   },
-  "include": ["src/**/*.ts", "src/types/**/*.d.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts", "src/types/**/*.d.ts"],  // Include custom types and all TypeScript files
+  "exclude": ["node_modules"],  // Exclude node_modules directory
+  "files": ["src/interfaces/custom.d.ts"]  // Include custom type declarations
 }

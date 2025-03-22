@@ -20,7 +20,6 @@ export interface IUser extends Document {
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
-  isActive:boolean
 }
 
 
@@ -59,11 +58,6 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     role: {
       type: String,
       default: "user",
-    },
-
-    isActive:{
-      type:Boolean,
-      default: false
     }
   },
   { timestamps: true },

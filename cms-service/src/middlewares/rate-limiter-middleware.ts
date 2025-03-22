@@ -5,7 +5,7 @@ const RATE_LIMIT = 10000; // 10k requests per minute
 const TTL = 60; // 60 seconds (1 minute)
 
 export const rateLimiter = async (req: Request, res: Response, next: NextFunction) => {
-  const accountId = req.body.accountId; // Assuming accountId comes in the body or headers
+  const accountId = req.user._id.toString(); // Assuming accountId comes in the body or headers
 
   if (!accountId) {
     return res.status(400).json({ message: 'AccountId is required' });

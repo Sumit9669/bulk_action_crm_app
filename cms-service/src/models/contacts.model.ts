@@ -8,6 +8,7 @@ export interface IContact extends Document {
     phone?: string;
     address?: string;
     rawFileId:Types.ObjectId | IRawFile;
+    accountId:string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,6 +20,7 @@ const contactSchema: Schema<IContact> = new Schema(
         email: { type: String, required: true, unique: true },
         phone: { type: String, required: false },
         address: { type: String, required: false },
+        accountId:{ type: String, required: true },
         rawFileId:{
             type: Schema.Types.ObjectId,
             ref: "raw_files",

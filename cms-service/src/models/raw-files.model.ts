@@ -13,7 +13,8 @@ export interface IRawFile extends Document {
     currentDataIndex:number,
     totalRecirds:number,
     scheduleTime:Date,
-    isScheduled:boolean
+    isScheduled:boolean,
+    accountId:string
 }
 
 // Define the schema for the Contact model
@@ -44,6 +45,7 @@ const RawFileSchema: Schema<IRawFile> = new Schema(
             type:Boolean,
             default:false
         },
+        accountId:{ type: String, required: true },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now }
     },

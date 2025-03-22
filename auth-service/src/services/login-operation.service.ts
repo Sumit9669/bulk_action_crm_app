@@ -43,8 +43,9 @@ export class LoginOperationService {
     }
 
 
-    async logoutUser() {
-        // redis.del(userId);
+    async logoutUser(refreshToken:string, userId:string) {
+        redis.del(userId);
+        redis.del(refreshToken);
         return true;
     }
 
@@ -66,6 +67,8 @@ export class LoginOperationService {
             process.env.REFRESH_TOKEN as string,
             { expiresIn: "30d", issuer: process.env.JWT_ISSUER, algorithm: "HS256" },
           );
+          redis.set(`user-${user._id.toString()}`,JSON.stringify(user), {EX:10000});
+          redis.set(refreshToken,JSON.stringify(user), {EX:10000});
           return {accessToken, refreshToken}
     }
 }

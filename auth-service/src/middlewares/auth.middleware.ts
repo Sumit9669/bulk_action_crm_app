@@ -4,7 +4,6 @@ import { errorMessages, statusCodes } from '../constants/common.constants';
 import ErrorHandler from '../utils/error-handler';
 import { CatchAsyncError } from './catch-async-error.midleware';
 import { redis } from '../utils/redis';
-import { rateLimiter } from './rate-limiter-middleware';
 
 // authenticated user
 export const isAuthenticated = CatchAsyncError(
@@ -28,10 +27,9 @@ export const isAuthenticated = CatchAsyncError(
         return next(new ErrorHandler(errorMessages.AUTH_ACCESS_ERROR, statusCodes.UNAUTHORIZED));
       }
 
-      req.user = user;  // Assign the user to req.user
-   
-      await rateLimiter(req, res, next);
-
+      (req as any).user = user;  // Assign the user to req.user
+      // await rateLimiter(req, res, next);
+      next();
     } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         // Token has expired

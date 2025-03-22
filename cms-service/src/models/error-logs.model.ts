@@ -9,6 +9,7 @@ export interface IErrorLogs extends Document {
     status: string;
     errorDetail: string;
     actionType: number;
+    accountId:string;
     metaData: object;
     createdAt: Date;
     updatedAt: Date;
@@ -17,15 +18,16 @@ export interface IErrorLogs extends Document {
 // Define the schema for the Contact model
 const errorLogsSchema: Schema<IErrorLogs> = new Schema(
     {
-        name: { type: String, required: true },
+        name: { type: String, required: false },
         rawFileId: {
             type: Schema.Types.ObjectId,
             ref: "raw_files",
-            required: true,
+            required: false,
         },
         status: { type: String, required: false },
         errorDetail: { type: String, required: false },
         actionType:{ type: Number, required: true, default:null,enum:FileActions },
+        accountId:{ type: String, required: false },
         metaData: {
             type:Object,
             required:false,
@@ -40,6 +42,6 @@ const errorLogsSchema: Schema<IErrorLogs> = new Schema(
 );
 
 // Create and export the model
-const ErrorLogsModel: Model<IErrorLogs> = mongoose.model<IErrorLogs>('Contact', errorLogsSchema);
+const ErrorLogsModel: Model<IErrorLogs> = mongoose.model<IErrorLogs>('error_logs', errorLogsSchema);
 
 export default ErrorLogsModel;
