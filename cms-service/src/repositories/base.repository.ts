@@ -8,7 +8,7 @@ export interface IBaseRepository<T extends Document> {
     update(id: string, payload: T): Promise<void>;
     delete(id: string): Promise<void>;
     addBulk(items: T[]): Promise<void>;
-    updateBulk(updates: { id: string; payload: T }[]): Promise<void>;
+    updateBulk(updates: { filter: Record<string, any>; payload: T }[]): Promise<void>;
     deleteBulk(ids: string[]): Promise<void>;
     count(): Promise<number>;
     aggregate(pipeline: object[]): Promise<any[]>;
@@ -34,7 +34,7 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
         try{
             await this.model.create(item);
         }catch(error){
-            console.log(error);
+            console.log('error detail',error);
         }
   
     }
@@ -88,13 +88,16 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
         }
     }
 
-    async updateBulk(updates: { id: string; payload: T }[]): Promise<void> {
-        const bulkOps = updates.map(({ id, payload }) => ({
+    async updateBulk(updates: { filter: Record<string, any>; payload: T }[]): Promise<void> {
+        const bulkOps = updates.map(({ filter, payload }) => ({
             updateOne: {
-                filter: { _id: id },
+                filter, // Use the dynamic filter passed in the update data
                 update: { $set: payload },
+             
             },
         }));
+    
+        // Perform the bulk update using the model's bulkWrite method
         await this.model.bulkWrite(bulkOps);
     }
 

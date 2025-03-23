@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { ContactsRepository } from '../repositories/contacts.repository';
 import ContactModel from '../models/contacts.model';
+import { ContactOperationService } from '../services/contacts-operation.service';
 
 const contactsRepository = new ContactsRepository();
-
+const contactOpsSvc = new ContactOperationService();
 class ContactsController {
     // Create a new contact
     async create(req: Request, res: Response): Promise<void> {
@@ -58,7 +59,7 @@ class ContactsController {
     // Update contact by ID
     async update(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const { id, logType } = req.params;
             const updateData = req.body;
 
             // Ensure the contact exists before updating
@@ -68,14 +69,7 @@ class ContactsController {
                 return;
             }
 
-            // Use the Mongoose model instance for the update
-            const updatedContact = {
-                ...existingContact.toObject(),
-                ...updateData,
-                updatedAt: new Date(),
-            };
-
-            await contactsRepository.update(id, updatedContact);
+            await contactOpsSvc.updateContactData(updateData,Number(logType),id);
 
             res.status(200).json({ message: 'Contact updated successfully' });
         } catch (error: any) {

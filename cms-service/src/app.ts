@@ -25,7 +25,7 @@ app.use(cors());  // Enable CORS for all routes
 })();
 
 // Routes
-app.use('/cms-service', uploadFileRouter);
+app.use('/cms-service', uploadFileRouter,contactRouter);
 
 // Error Handling Middleware (for unhandled routes)
 app.get("*", (req: Request, res: Response, next: NextFunction) => {

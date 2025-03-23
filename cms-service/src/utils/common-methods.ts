@@ -1,3 +1,4 @@
+import { IErrorLogs } from "../models/error-logs.model";
 import { ErrorLogsRepository } from "../repositories/error-logs.repository";
 
 
@@ -43,7 +44,7 @@ export class CommonMethods {
      * timestamp, and any other relevant data that can help in diagnosing and troubleshooting the error.
      */
     async errorLogger(errorDetail: any) {
-        await errorLogRepo.add(errorDetail);
+        await errorLogRepo.add(errorDetail as IErrorLogs);
     }
 }
 

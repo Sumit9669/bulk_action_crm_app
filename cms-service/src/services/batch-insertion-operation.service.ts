@@ -147,7 +147,7 @@ export class BatchInsetionOperationService {
      * custom type indicating different states such as "processing", "completed", "failed", etc. This
      * status is used to
      */
-    private async updateBatchStatus(lastProcessedIndex: number, id: string, status: FileStatus, actionType:number, accountId:string): Promise<void> {
+     async updateBatchStatus(lastProcessedIndex: number, id: string, status: FileStatus, actionType:number, accountId:string): Promise<void> {
         // You could save the last processed index in the database or update a status field to track progress
         try {
             // Update the status of the processing, e.g., in the database or status tracker
@@ -176,7 +176,7 @@ export class BatchInsetionOperationService {
     processed, and `processedIndex` which represents the index up to which the processing has been
     completed. */
     // Function to update final processing status in the database (e.g., marking the file as fully processed)
-    private async updateFinalStatus(rawFileId: string, processedIndex: number,actionType:number,accountId:string): Promise<void> {
+     async updateFinalStatus(rawFileId: string, processedIndex: number,actionType:number,accountId:string): Promise<void> {
         try {
             // Update final processing status (e.g., mark the file processing as completed)
             const rawFilePayload: Partial<IRawFile> = {

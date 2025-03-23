@@ -95,10 +95,10 @@ For accessing the APIs of the CRM, authentication and authorization are required
 4. Use the **access token** created in the third step as the **Authorization Bearer Token** in the `cms-service` to access endpoints and perform bulk actions.
 
 ## Postman Collection:
-A comprehensive **Postman collection** for API testing has been provided. You can download the collection [here](path_to_postman_collection_file).
+A comprehensive **Postman collection** for API testing has been provided. You can download the collection [here](https://drive.google.com/file/d/1qR6knv6_sWWw8xLqTeTAwlM1R_zI7Hj-/view?usp=drive_link).
 
 ## Loom Video:
-A **Loom video** explaining the architecture and providing a demo of the platform can be viewed [here](loom_video_link).
+A **Loom video** explaining the architecture and providing a demo of the platform can be viewed [here](https://www.loom.com/share/8ca6bef546b542c8b4045a862850d80c).
 
 ## Setup Instructions:
 
@@ -123,7 +123,7 @@ A **Loom video** explaining the architecture and providing a demo of the platfor
 6. Create Token user register and login API as mention in authrizationa and authentication step
 7. Hit cms service post API **http://localhost:3003/cms-service/bulk-actions/0**
    make sure to pass following data in payload
-   ```json
+   ```bash
     > in Authrization pass bearer token
     > set form data for request body
     > pass action  as 0 to insert and 1 to update
@@ -136,7 +136,7 @@ A **Loom video** explaining the architecture and providing a demo of the platfor
     curl --location 'http://localhost:3003/    cms-service/bulk-actions/0' \--header 'Authorization: Bearer     eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.    eyJpZCI6IjY3ZGRiMTEyNWEwOTEzNWUyZjI5NjR    iYyIsImlhdCI6MTc0MjYzMDc2NCwiZXhwIjoxNz    QyNjMyNTY0LCJpc3MiOiJidWxrX0FjdGlvbl9jc    m1fYXBwIn0.    C9OF0pVAK6yWvgeU32a5tuTD_Ts4mkz-F0Po94M    mol0' \--form 'csvFile=@"/C:/Users/sumit/    Downloads/Untitled spreadsheet -     Sheet1 (2).csv"' \--form 'scheduleTime="Sat Mar 22 2025     08:52:17 GMT+0530 (India Standard Time)    "' \--form 'action="0"'
 
 8. To get current all task status
-   ```json
+   ```bash
    > hit get API **http://localhost:3000/cms-service/bulk-actions**
    > curl request
 
@@ -145,7 +145,7 @@ A **Loom video** explaining the architecture and providing a demo of the platfor
 
 9. To get stats detail for particular ongoing task or completed task
    
-    ```json
+    ```bash
     > Hit API **http://localhost:3000/cms-service/bulk-actions/67dc76b9ee9444b910b69d00/stat**
     > curl request
 
