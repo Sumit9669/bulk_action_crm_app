@@ -30,7 +30,20 @@ export abstract class BaseRepository<T extends Document> implements IBaseReposit
     }
 //mongodb+srv://fullstackdevsumit68:iM7vI245LcWK4hoL@crm-app.16iis.mongodb.net/?retryWrites=true&w=majority&appName=crm-app';
     // Create
+
+    private async checkConnection(): Promise<void> {
+        try {
+            if (mongoose.connection.readyState !== 1) { // 1 indicates connected
+                console.log("Database is not connected, attempting to reconnect...");
+                await MongoDBConnection(); // Reattempt connection if disconnected
+            }
+        } catch (error) {
+            console.error("Error during DB connection check:", error);
+        }
+    }
+
     async add(item: T): Promise<void> {
+        await this.checkConnection();
         try{
             await this.model.create(item);
         }catch(error){

@@ -9,6 +9,7 @@ import { RawFileRepository } from '../repositories/rawFile.repository'
 import RawFileModel from '../models/raw-files.model';
 import { FileActions } from '../interfaces/enums/common.enum';
 import { BatchUpdateOperationService } from './batch-update-operations.service';
+import { redis } from '../utils/redis';
 const bactchInsertSvc = new BatchInsetionOperationService();
 const batchUpdateOps = new BatchUpdateOperationService();
 export class UploadFileOPerationService {
@@ -167,6 +168,9 @@ export class UploadFileOPerationService {
                 isScheduled: scheduleTime ? true : false
             });
             await this.rawFileRepository.add(rawFile);
+            // update event rate limit for user
+            const currentLimit = await redis.get(`rate-limit:${accountId}`);
+            redis.set(`rate-limit:${accountId}`, currentLimit+Number(jsonData.length >0?jsonData.length :1),{EX:60});
             // call batch insert method to initiate insertion
             if (!rawFile.isScheduled) {
                 if (action === FileActions.UPDATE) {

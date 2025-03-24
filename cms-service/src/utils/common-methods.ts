@@ -1,4 +1,4 @@
-import { IErrorLogs } from "../models/error-logs.model";
+import ErrorLogsModel, { IErrorLogs } from "../models/error-logs.model";
 import { ErrorLogsRepository } from "../repositories/error-logs.repository";
 
 

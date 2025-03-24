@@ -25,7 +25,7 @@ const errorLogsSchema: Schema<IErrorLogs> = new Schema(
             required: false,
         },
         status: { type: String, required: false },
-        errorDetail: { type: String, required: false },
+        errorDetail: { type: String, required: true },
         actionType:{ type: Number, required: true, default:null,enum:FileActions },
         accountId:{ type: String, required: false },
         metaData: {
